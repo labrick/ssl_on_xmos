@@ -961,4 +961,5 @@
 		<project id="AN00162_i2s_loopback_demo.null.1841822317" name="AN00162_i2s_loopback_demo"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope"/>
 </cproject>

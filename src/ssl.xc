@@ -34,26 +34,50 @@ void ssl_loopback(client interface ssl_callback_if i)
             i.update_particle();
             break;
         }
-        break;
+//        break;
     }
 }
 
-void wav2frame(streaming chanend c_wav, streaming chanend c_frame)
+void wav2frame(streaming chanend c_wav, server interface wav_frame_if i_frame, streaming chanend c_frame)
 {
     int32_t in_samps[4] = {0};
-
+    int to_frame = 0;
     while(1){
-        for (size_t j = 0; j < 4; j++) {
-            c_wav :> in_samps[j];
+        if(to_frame == 0){
+            for (size_t j = 0; j < 4; j++) {
+                c_wav :> in_samps[j];
+            }
         }
-        xscope_int(CH_0, in_samps[0]);
-        xscope_int(CH_1, in_samps[1]);
-        xscope_int(CH_2, in_samps[2]);
-        xscope_int(CH_3, in_samps[3]);
+        else{
+            to_frame = 0;
+            for(size_t i=0; i<FRAME_SIZE; i++){
+                for(size_t j=0; j<4; j++){
+                    c_wav :> in_samps[j];
+                    c_frame <: in_samps[j];
+//                    printf("%d\n", in_samps[j]);
+                }
+            }
+        }
+
+//        xscope_int(CH_0, in_samps[0]);
+//        xscope_int(CH_1, in_samps[1]);
+//        xscope_int(CH_2, in_samps[2]);
+//        xscope_int(CH_3, in_samps[3]);
+//        printf("%d\n", in_samps[0]);
+        select{
+            case i_frame.get_frame_data():
+                to_frame = 1;
+                break;
+            default:
+                break;
+        }
     }
 }
 
-void ssl_implement(server interface ssl_callback_if i, streaming chanend c_frame)
+void ssl_implement(
+        server interface ssl_callback_if i,
+        client interface wav_frame_if i_frame,
+        streaming chanend c_frame)
 {
     // notice: MIC_PAIR = row
     printf("MIC_PAIR:%d, SEARCH_POINT:%d\n", MIC_PAIR, SEARCH_POINT);
@@ -63,8 +87,10 @@ void ssl_implement(server interface ssl_callback_if i, streaming chanend c_frame
     int8_t particle_location[POPULATION_NUM][3];
     float particle_speed[POPULATION_NUM][3];
     int8_t best_location[POPULATION_NUM][3];
-    int8_t best_fitness[POPULATION_NUM][3];
-    int8_t best_location_in_all[3];
+//    int8_t best_fitness[POPULATION_NUM][3];
+//    int8_t best_location_in_all[3];
+
+    int32_t enframe_data[4][FRAME_SIZE];
 
     while(1){
         select{
@@ -91,6 +117,18 @@ void ssl_implement(server interface ssl_callback_if i, streaming chanend c_frame
                 break;
             case i.get_wav_frame():
                 printf("get_wav_frame\n");
+                i_frame.get_frame_data();
+//                while(1)
+                for(size_t i=0; i<FRAME_SIZE; i++){
+                    for(size_t j=0; j<4; j++){
+                        c_frame :> enframe_data[j][i];
+//                        printf("------%d\n", enframe_data[j][i]);
+                    }
+                    xscope_int(CH_0, enframe_data[0][i]);
+                    xscope_int(CH_1, enframe_data[1][i]);
+                    xscope_int(CH_2, enframe_data[2][i]);
+                    xscope_int(CH_3, enframe_data[3][i]);
+                }
                 break;
             case i.extract_audio_frame():
                 printf("extract_audio_frame\n");

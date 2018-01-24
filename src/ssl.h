@@ -9,6 +9,7 @@
 #define SSL_H_
 
 #include <stdint.h>
+
 //void ssl();
 
 interface ssl_callback_if {
@@ -33,8 +34,15 @@ interface ssl_callback_if {
     void update_particle();
 };
 
-void ssl_implement(server interface ssl_callback_if i, streaming chanend c_frame);
+interface wav_frame_if {
+    void get_frame_data();
+};
+
+void ssl_implement(
+        server interface ssl_callback_if i,
+        client interface wav_frame_if i_frame,
+        streaming chanend c_frame);
 void ssl_loopback(client interface ssl_callback_if i);
-void wav2frame(streaming chanend c_wav, streaming chanend c_frame);
+void wav2frame(streaming chanend c_wav, server interface wav_frame_if i_frame, streaming chanend c_frame);
 
 #endif /* SSL_H_ */
