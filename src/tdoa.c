@@ -37,7 +37,7 @@ void create_tdoa_table(int8_t TDOA_table[MIC_PAIR][SEARCH_POINT])
                 dd = d2 - d1;
                 tdoa = round((dd/C)*FS);
 //                printf("int tdoa is %d, i=%d, mic_pair=%d\n", tdoa, i, mic_pair_cnt);
-                TDOA_table[mic_pair_cnt][i]=tdoa;
+                TDOA_table[mic_pair_cnt][i] = tdoa;
                 mic_pair_cnt++;
             }
         }

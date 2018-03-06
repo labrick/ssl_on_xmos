@@ -13,9 +13,13 @@
 #include <xscope.h>
 // for memcpy
 #include <string.h>
+// for malloc
+#include <stdlib.h>
 
 #include "tdoa.h"
 #include "particle.h"
+#include "fft.h"
+#include "srp.h"
 
 
 void ssl_loopback(client interface ssl_callback_if i)
@@ -25,7 +29,7 @@ void ssl_loopback(client interface ssl_callback_if i)
         printf("hello world!\n");
         i.init_particle();
         i.get_wav_frame();
-        i.extract_audio_frame();
+//        i.extract_audio_frame();
         i.srp_formulate();
         while(1){
             i.caculate_srp();
@@ -90,7 +94,8 @@ void ssl_implement(
 //    int8_t best_fitness[POPULATION_NUM][3];
 //    int8_t best_location_in_all[3];
 
-    int32_t enframe_data[4][FRAME_SIZE];
+    int32_t enframe_data[MIC][FRAME_SIZE];
+    float R[MIC_PAIR][FRAME_SIZE];
 
     while(1){
         select{
@@ -120,7 +125,7 @@ void ssl_implement(
                 i_frame.get_frame_data();
 //                while(1)
                 for(size_t i=0; i<FRAME_SIZE; i++){
-                    for(size_t j=0; j<4; j++){
+                    for(size_t j=0; j<MIC; j++){
                         c_frame :> enframe_data[j][i];
 //                        printf("------%d\n", enframe_data[j][i]);
                     }
@@ -131,13 +136,16 @@ void ssl_implement(
                 }
                 break;
             case i.extract_audio_frame():
+                // vad
                 printf("extract_audio_frame\n");
                 break;
             case i.srp_formulate():
+                caculate_gccphat(enframe_data, R);
                 printf("srp_formulate\n");
                 break;
             case i.caculate_srp():
-                printf("caculate_srp\n");
+                int index = find_source_location(TDOA_table, R);
+                printf("caculate_srp:%d\n", index);
                 break;
             case i.ssl_is_ok():
                 printf("ssl_is_ok\n");
