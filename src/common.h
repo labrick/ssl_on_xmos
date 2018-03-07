@@ -10,9 +10,9 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
- /**********************
- *config the srp-phat*/
- /**********************/
+/**********************
+* config the srp-phat */
+/**********************/
 // 每一帧数据个数
 #define FRAME_SIZE 4096
 #define MIC 4                   //麦克风数量

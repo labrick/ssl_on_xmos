@@ -190,7 +190,7 @@ int main()
     /* The application - loopback the I2S samples */
     on tile[0]: [[distribute]] i2s_loopback(i_i2s, i_i2c[0], i_gpio[0], i_gpio[1], i_gpio[2], i_gpio[3], c_wav);
     on tile[0]: wav2frame(c_wav, i_frame, c_frame);
-    on tile[1]: ssl_loopback(i_ssl);
+    on tile[0]: ssl_loopback(i_ssl);
     on tile[1]: ssl_implement(i_ssl, i_frame, c_frame);
   }
   return 0;

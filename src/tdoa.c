@@ -89,8 +89,8 @@ cPOINT sph_to_cart(pPOINT point)
 
 /**********************
 * 计算两个坐标之间的距离
-输入：两个点的极坐标
-输出：两点之间的距离
+* 输入：两个点的极坐标
+* 输出：两点之间的距离
 **********************/
 float calulate_distance(aPOINT x1 ,aPOINT x2)
 {

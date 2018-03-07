@@ -21,7 +21,6 @@
 #include "fft.h"
 #include "srp.h"
 
-
 void ssl_loopback(client interface ssl_callback_if i)
 {
     i.create_tdoa_table();
