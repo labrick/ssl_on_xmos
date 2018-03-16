@@ -171,7 +171,8 @@ int main()
   interface i2s_callback_if i_i2s;
   interface i2c_master_if i_i2c[1];
   interface output_gpio_if i_gpio[4];
-  interface ssl_callback_if i_ssl;
+  interface audio_callback_if i_audio_server;
+  interface tdoa_callback_if i_tdoa_server;
   streaming chan c_wav;
   interface wav_frame_if i_frame;
   streaming chan c_frame;
@@ -190,8 +191,9 @@ int main()
     /* The application - loopback the I2S samples */
     on tile[0]: [[distribute]] i2s_loopback(i_i2s, i_i2c[0], i_gpio[0], i_gpio[1], i_gpio[2], i_gpio[3], c_wav);
     on tile[0]: wav2frame(c_wav, i_frame, c_frame);
-    on tile[0]: ssl_loopback(i_ssl);
-    on tile[1]: ssl_implement(i_ssl, i_frame, c_frame);
+    on tile[0]: ssl_loopback(i_audio_server, i_tdoa_server);
+    on tile[0]: tdoa_server(i_tdoa_server);
+    on tile[1]: audio_server(i_audio_server, i_frame, c_frame);
   }
   return 0;
 }
