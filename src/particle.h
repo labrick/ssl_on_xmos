@@ -26,6 +26,12 @@
 
 // pso parameter
 
-void init_particle(int8_t particle_location[POPULATION_NUM][3], float particle_speed[POPULATION_NUM][3]);
-
+void init_particle(
+        int8_t particle_location[POPULATION_NUM][3],
+        float particle_speed[POPULATION_NUM][3]);
+int32_t update_particle(
+        int8_t particle_location[POPULATION_NUM][3],
+        float particle_speed[POPULATION_NUM][3],
+        int8_t best_fitness[POPULATION_NUM][3],
+        int8_t best_location_in_all[3]);
 #endif /* PARTICLE_H_ */

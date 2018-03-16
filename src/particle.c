@@ -35,3 +35,14 @@ void init_particle(int8_t particle_location[POPULATION_NUM][3], float particle_s
         particle_speed[i][Z] = (rand() % N)/(float)N;
     }
 }
+
+int32_t update_particle(
+        int8_t particle_location[POPULATION_NUM][3],
+        float particle_speed[POPULATION_NUM][3],
+        int8_t best_fitness[POPULATION_NUM][3],
+        int8_t best_location_in_all[3])
+{
+    static int32_t index = -1;
+    index++;
+    return index;
+}
