@@ -46,32 +46,6 @@ void process_datafft(complex data[FRAME_SIZE])
         data[i].imag = data[i].imag/phat;
     }
 }
-        
-/*******************************
-* 遍历搜索的srp-phat程序
-* 输入：互相关函数表格
-* 输出:srp_global表格，就是每个遍
-* 历点的srp-phat值
-*******************************/
-void srpphat(
-    float R[MIC_PAIR][FRAME_SIZE],
-    int8_t TDOA_table[MIC_PAIR][SEARCH_POINT],
-    float result[SEARCH_POINT])
-{
-    int i,p;
-    float srp_local=0;
-    int  time_diff=0;
-    int center = (FRAME_SIZE/2)-1;
-    for(i=0; i<SEARCH_POINT; i++){
-        srp_local = 0;
-        for(p=0; p<MIC_PAIR; p++){
-            time_diff = TDOA_table[p][i] + center;
-            srp_local = srp_local + R[p][time_diff];
-        }
-        result[i] = srp_local;
-    }
-}
-
 
 /*******************************
 * 计算互相关函数表格函数
@@ -80,42 +54,32 @@ void srpphat(
 *
 * result[][]中存放的是最终的输出结果
 *******************************/
-void caculate_gccphat(int32_t enframe_data[MIC][FRAME_SIZE] ,float result[MIC_PAIR][FRAME_SIZE])
+void caculate_gccphat(complex enframe_data[MIC][FRAME_SIZE], complex result[MIC_PAIR][FRAME_SIZE]) // ,float result[MIC_PAIR][FRAME_SIZE])
 {
-//    float enframe_data_real[MIC][FRAME_SIZE];
-//    float enframe_data_imag[MIC][FRAME_SIZE];
-    complex enframe_fft_data[MIC][FRAME_SIZE];
-    complex fft_result[MIC_PAIR][FRAME_SIZE];
+//    complex enframe_fft_data[MIC][FRAME_SIZE];
+//    complex fft_result[MIC_PAIR][FRAME_SIZE];
 
-    for(int8_t i=0; i<MIC; i++){
-        for(int32_t j=0; j<FRAME_SIZE; j++){
-            enframe_fft_data[i][j].real = enframe_data[i][j];
-        }
-    }
     printf("do fft ...\n");
     for(int8_t i=0; i<MIC; i++){
 //        fftComputeOnce(myFFT, enframe_data[i], enframe_data_real[i], enframe_data_imag[i]);
-        fft(FRAME_SIZE, enframe_fft_data[i]);
+        fft(FRAME_SIZE, enframe_data[i]);
     }
-    
+
     for(int8_t i=0; i<MIC; i++){
-        process_datafft(enframe_fft_data[i]);
+        process_datafft(enframe_data[i]);
     }
 
    // Calculate the cross-power spectrum = fft(x1).*conj(fft(x2))
     int p = 0;
     for(int8_t i=0; i<MIC; i++){
         for(int8_t j=i+1; j<MIC; j++){
-           point_multi(enframe_fft_data[i], enframe_fft_data[j], fft_result[p], FRAME_SIZE); //ss = MIC[first_data]*MIC[j];
+           point_multi(enframe_data[i], enframe_data[j], result[p], FRAME_SIZE); //ss = MIC[first_data]*MIC[j];
            p++;
         }
     }
     for(int8_t p=0; p<MIC_PAIR; p++){
 //        ifftComputeOnce(myFFT, result_real, result_imag ,result[p]);
-        ifft(FRAME_SIZE, fft_result[p]);
-        for(int32_t j=0; j<FRAME_SIZE; j++){
-            result[p][j] = fft_result[p][j].real;
-        }
+        ifft(FRAME_SIZE, result[p]);
     }
 }
 
@@ -144,17 +108,42 @@ void caculate_gccphat(int32_t enframe_data[MIC][FRAME_SIZE] ,float result[MIC_PA
 //    return max_loc;
 //}
 
-int32_t find_source_location(int8_t TDOA_table[MIC_PAIR][SEARCH_POINT], float R[MIC_PAIR][FRAME_SIZE])
-{
-    int max_loc;
-    float max_srp;
-    float srp_global[SEARCH_POINT];
-    srpphat(R, TDOA_table, srp_global);
-    for(int32_t i=0; i<SEARCH_POINT; i++){
-        if(srp_global[i] > max_srp){
-            max_srp = srp_global[i];
-            max_loc = i;
-        }
-    }
-    return max_loc;
-}
+/*******************************
+* 遍历搜索的srp-phat程序
+* 输入：互相关函数表格
+* 输出:srp_global表格，就是每个遍
+* 历点的srp-phat值
+*******************************/
+//void srpphat(
+//    float R[MIC_PAIR][FRAME_SIZE],
+//    int8_t TDOA_table[MIC_PAIR][SEARCH_POINT],
+//    float result[SEARCH_POINT])
+//{
+//    int i,p;
+//    float srp_local=0;
+//    int  time_diff=0;
+//    int center = (FRAME_SIZE/2)-1;
+//    for(i=0; i<SEARCH_POINT; i++){
+//        srp_local = 0;
+//        for(p=0; p<MIC_PAIR; p++){
+//            time_diff = TDOA_table[p][i] + center;
+//            srp_local = srp_local + R[p][time_diff];
+//        }
+//        result[i] = srp_local;
+//    }
+//}
+
+//int32_t find_source_location(int8_t TDOA_table[MIC_PAIR][SEARCH_POINT], float R[MIC_PAIR][FRAME_SIZE])
+//{
+//    int max_loc;
+//    float max_srp;
+//    float srp_global[SEARCH_POINT];
+//    srpphat(R, TDOA_table, srp_global);
+//    for(int32_t i=0; i<SEARCH_POINT; i++){
+//        if(srp_global[i] > max_srp){
+//            max_srp = srp_global[i];
+//            max_loc = i;
+//        }
+//    }
+//    return max_loc;
+//}

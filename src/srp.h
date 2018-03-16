@@ -12,7 +12,8 @@ struct mic_Array{
 };
 
 void showfft(float *real ,float *imag);
-void caculate_gccphat(int32_t enframe_data[MIC][FRAME_SIZE] ,float result[MIC_PAIR][FRAME_SIZE]);
+// void caculate_gccphat(int32_t enframe_data[MIC][FRAME_SIZE] ,float result[MIC_PAIR][FRAME_SIZE]);
+void caculate_gccphat(complex enframe_data[MIC][FRAME_SIZE], complex result[MIC_PAIR][FRAME_SIZE]);
 void srpphat(float R[MIC_PAIR][FRAME_SIZE] , int8_t TDOA_table[MIC_PAIR][SEARCH_POINT],float *result);
 //void point_multi(complex* data1, complex* data2, complex* result, int FRAME_SIZE);
 void process_datafft(complex data[FRAME_SIZE]);
