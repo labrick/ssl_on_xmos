@@ -146,7 +146,8 @@ void audio_server(
     printf("MIC_PAIR:%d, SEARCH_POINT:%d\n", MIC_PAIR, SEARCH_POINT);
 
     complex enframe_data[MIC][FRAME_SIZE];
-    float R[MIC_PAIR][FRAME_SIZE];
+//    float R[MIC_PAIR][FRAME_SIZE];
+    complex R[MIC_PAIR][FRAME_SIZE];
 
     while(1){
         select{
@@ -175,12 +176,12 @@ void audio_server(
             case i.caculate_srp(int8_t td0, int8_t td1, int8_t td2,
                     int8_t td3, int8_t td4, int8_t td5) -> float srp_local:
                 int center = (FRAME_SIZE/2)-1;
-                srp_local = srp_local + R[0][td0 + center];
-                srp_local = srp_local + R[1][td1 + center];
-                srp_local = srp_local + R[2][td2 + center];
-                srp_local = srp_local + R[3][td3 + center];
-                srp_local = srp_local + R[4][td4 + center];
-                srp_local = srp_local + R[5][td5 + center];
+                srp_local = srp_local + R[0][td0 + center].real;
+                srp_local = srp_local + R[1][td1 + center].real;
+                srp_local = srp_local + R[2][td2 + center].real;
+                srp_local = srp_local + R[3][td3 + center].real;
+                srp_local = srp_local + R[4][td4 + center].real;
+                srp_local = srp_local + R[5][td5 + center].real;
 //                int index = find_source_location(TDOA_table, R);
 //                printf("caculate_srp:%d\n", index);
                 break;
