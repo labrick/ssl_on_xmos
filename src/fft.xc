@@ -90,11 +90,11 @@ void fft(int N, complex f[])
         // 碟形运算
         for(l=1; l<=lb; l++){
             r = (l-1) * pow(2, M-m);
+            Wn_i(N, r, &wn, 1);         // wn=Wnr
             // 遍历每个分组，分组总数为N/la
             for(n=l-1; n<N-1; n=n+la){
                 // n,lc分别代表一个碟形单元的上、下节点编号
                 lc = n + lb;
-                Wn_i(N, r, &wn, 1);         // wn=Wnr
                 c_mul(f[lc], wn, &t);       // t = f[lc] * wn复数运算
                 c_sub(f[n], t, &(f[lc]));   // f[lc] = f[n] - f[lc] * Wnr
                 c_plus(f[n], t, &(f[n]));   // f[n] = f[n] + f[lc] * Wnr
