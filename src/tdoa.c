@@ -1,4 +1,5 @@
 #include "tdoa.h"
+#include "math.h"
 
 /*var*/
 aPOINT mic_loc[MIC]={
@@ -85,6 +86,21 @@ cPOINT sph_to_cart(pPOINT point)
     cpoint.z = point.r*sin(point.phi) + mic_array_origin.z;
     return cpoint;
   //  printf("z  theta is %f %f\n",sph[1],plot[2]);
+}
+
+/**********************
+* 将直角坐标转换成球坐标
+**********************/
+pPOINT cart_to_sph(cPOINT point)
+{
+    pPOINT ppoint;
+    ppoint.theta = atan2(point.y, point.x) * 180 /PI;
+    float xy = sqrt((double)(point.x*point.x + point.y*point.y));
+    ppoint.phi = atan2(point.z, xy) * 180 /PI;
+    ppoint.r = (int)sqrt((double)(point.x*point.x + point.y*point.y + point.z*point.z));
+//    printf("xyz:%d, %d, %d, tpr: %d, %d, %d\n", point.x, point.y, point.z,
+//            ppoint.theta, ppoint.phi, ppoint.r);
+    return ppoint;
 }
 
 /**********************

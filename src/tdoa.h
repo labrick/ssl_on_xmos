@@ -6,6 +6,10 @@
 #include <stdint.h>
 #include "common.h"
 
+#ifndef PI
+#define PI 3.1415926535897932384626433832795028841971
+#endif
+
 // cart point struct
 typedef struct CART_POINT{
     int16_t x;          // mm
@@ -31,6 +35,7 @@ float calulate_distance(aPOINT x1 ,aPOINT x2);
 #ifdef USE_CARTESIAN_COORDINATE
     cPOINT index2xyz(int16_t origin_index);
     int16_t xyz2index(cPOINT point);
+    pPOINT cart_to_sph(cPOINT point);
 #else
     cPOINT sph_to_cart(pPOINT ppoint);
     pPOINT index2tpr(int16_t origin_index);
