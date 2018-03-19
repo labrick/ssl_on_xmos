@@ -14,7 +14,7 @@
 * config the srp-phat */
 /**********************/
 // 每一帧数据个数
-#define FRAME_SIZE 2048
+#define FRAME_SIZE 1024
 #define MIC 4                   //麦克风数量
 #define MIC_PAIR 6
 
