@@ -39,7 +39,9 @@ void wav2frame(streaming chanend c_wav, server interface wav_frame_if i_frame, s
                     c_frame <: in_samps[j];
 //                    printf("%d\n", in_samps[j]);
                 }
+//                printf("send one MIC ok!! %d\n", i);
             }
+//            printf("send one frame ok!!\n");
         }
 
 //        xscope_int(CH_0, in_samps[0]);
@@ -156,14 +158,17 @@ void audio_server(
                 i_frame.get_frame_data();
                 for(size_t i=0; i<FRAME_SIZE; i++){
                     for(size_t j=0; j<MIC; j++){
-                        c_frame :> enframe_data[j][i].real;
+                        // enframe_data[j][i].real is float type, here should be int
+                        c_frame :> (int)enframe_data[j][i].real;
 //                        printf("------%d\n", enframe_data[j][i]);
                     }
+//                    printf("receive one MIC ok!! %d\n", i);
 //                    xscope_int(CH_0, enframe_data[0][i]);
 //                    xscope_int(CH_1, enframe_data[1][i]);
 //                    xscope_int(CH_2, enframe_data[2][i]);
 //                    xscope_int(CH_3, enframe_data[3][i]);
                 }
+//                printf("receive one frame ok!!\n");
                 break;
             case i.extract_audio_frame():
                 // vad
