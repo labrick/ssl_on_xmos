@@ -148,8 +148,9 @@ void audio_server(
     printf("MIC_PAIR:%d, SEARCH_POINT:%d\n", MIC_PAIR, SEARCH_POINT);
 
     complex enframe_data[MIC][FRAME_SIZE];
-//    float R[MIC_PAIR][FRAME_SIZE];
     complex R[MIC_PAIR][FRAME_SIZE];
+    memset(enframe_data, 0, sizeof(complex)*MIC*FRAME_SIZE);
+    memset(R, 0, sizeof(complex)*MIC*FRAME_SIZE);
 
     int tmp;
     while(1){
