@@ -27,27 +27,31 @@ void wav2frame(streaming chanend c_wav, server interface wav_frame_if i_frame, s
     int to_frame = 0;
     while(1){
         if(to_frame == 0){
-            for (size_t j = 0; j < 4; j++) {
-                c_wav :> in_samps[j];
-            }
+            c_wav :> in_samps[1];
+            c_wav :> in_samps[3];
+            c_wav :> in_samps[2];
+            c_wav :> in_samps[0];
         }
         else{
             to_frame = 0;
             for(size_t i=0; i<FRAME_SIZE; i++){
-                for(size_t j=0; j<4; j++){
-                    c_wav :> in_samps[j];
-                    c_frame <: in_samps[j];
-//                    printf("%d\n", in_samps[j]);
-                }
+                c_wav :> in_samps[1];       // 0 data of second mic
+                c_frame <: in_samps[1];
+                c_wav :> in_samps[3];       // 1 data of third mic
+                c_frame <: in_samps[3];
+                c_wav :> in_samps[2];       // 2 data of second mic
+                c_frame <: in_samps[2];
+                c_wav :> in_samps[0];       // 3 data of four mic
+                c_frame <: in_samps[0];
 //                printf("send one MIC ok!! %d\n", i);
             }
 //            printf("send one frame ok!!\n");
         }
 
-//        xscope_int(CH_0, in_samps[0]);
-//        xscope_int(CH_1, in_samps[1]);
-//        xscope_int(CH_2, in_samps[2]);
-//        xscope_int(CH_3, in_samps[3]);
+        xscope_int(CH_0, in_samps[0]);
+        xscope_int(CH_1, in_samps[1]);
+        xscope_int(CH_2, in_samps[2]);
+        xscope_int(CH_3, in_samps[3]);
 //        printf("%d\n", in_samps[0]);
         select{
             case i_frame.get_frame_data():
