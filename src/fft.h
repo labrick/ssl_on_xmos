@@ -15,7 +15,9 @@ typedef struct complex //复数类型
   double imag;       //虚部
 }complex;
 
+#ifndef PI
 #define PI 3.1415926535897932384626433832795028841971
+#endif
 
 ///////////////////////////////////////////
 //void conjugate_complex(int n, complex in[], complex out[]);
