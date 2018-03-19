@@ -56,15 +56,11 @@ void process_datafft(complex data[FRAME_SIZE])
 *******************************/
 void caculate_gccphat(complex enframe_data[MIC][FRAME_SIZE], complex result[MIC_PAIR][FRAME_SIZE]) // ,float result[MIC_PAIR][FRAME_SIZE])
 {
-//    complex enframe_fft_data[MIC][FRAME_SIZE];
-//    complex fft_result[MIC_PAIR][FRAME_SIZE];
-
     printf("do fft ...\n");
     for(int8_t i=0; i<MIC; i++){
 //        fftComputeOnce(myFFT, enframe_data[i], enframe_data_real[i], enframe_data_imag[i]);
         fft(FRAME_SIZE, enframe_data[i]);
     }
-
     for(int8_t i=0; i<MIC; i++){
         process_datafft(enframe_data[i]);
     }
