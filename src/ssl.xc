@@ -151,6 +151,7 @@ void audio_server(
 //    float R[MIC_PAIR][FRAME_SIZE];
     complex R[MIC_PAIR][FRAME_SIZE];
 
+    int tmp;
     while(1){
         select{
             case i.get_wav_frame():
@@ -159,7 +160,8 @@ void audio_server(
                 for(size_t i=0; i<FRAME_SIZE; i++){
                     for(size_t j=0; j<MIC; j++){
                         // enframe_data[j][i].real is float type, here should be int
-                        c_frame :> (int)enframe_data[j][i].real;
+                        c_frame :> tmp;
+                        enframe_data[j][i].real = tmp;
 //                        printf("------%d\n", enframe_data[j][i]);
                     }
 //                    printf("receive one MIC ok!! %d\n", i);
