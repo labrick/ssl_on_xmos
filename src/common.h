@@ -6,6 +6,7 @@
  */
 // for printf
 #include <stdio.h>
+#include <stdint.h>
 
 #ifndef COMMON_H_
 #define COMMON_H_
