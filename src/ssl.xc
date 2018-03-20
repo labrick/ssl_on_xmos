@@ -94,6 +94,8 @@ void ssl_loopback(
                 int8_t td0, td1, td2, td3, td4, td5;
                 {td0, td1, td2, td3, td4, td5} = i_tdoa_server.get_tdoa_data(i);
                 float srp_phat = i_audio_server.caculate_srp(td0, td1, td2, td3, td4, td5);
+//                printf("get_tdoa_data:%d --> %d, %d, %d, %d, %d, %d -- > srp_phat: %f\n", i, td0, td1, td2, td3, td4, td5, srp_phat);
+//                printf("%f, ", srp_phat);
                 if(srp_phat > max_srp){
                     max_srp = srp_phat;
                     max_srp_index = i;
@@ -101,7 +103,9 @@ void ssl_loopback(
             }
             printf("max_srp_index: %d, max_srp: %f\n", max_srp_index, max_srp);
             cPOINT point = index2xyz(max_srp_index);
-            printf("max_srp_index to xyz: %d, %d, %d\n", point.x, point.y, point.z);
+//            printf("index2xyz, x:%d, y:%d, z:%d\n", point.x, point.y, point.z);
+            pPOINT ppoint = cart_to_sph(point);
+            printf("max_srp_index to sph: theta: %d, phi:%d, r:%d\n", ppoint.theta, ppoint.phi, ppoint.r);
 //            i_audio_server.ssl_is_ok();
 //            i_audio_server.get_results();
 //            i_audio_server.update_particle();
@@ -122,12 +126,13 @@ void tdoa_server(server interface tdoa_callback_if i)
             case i.create_tdoa_table():
                 printf("create_tdoa_table\n");
                 create_tdoa_table(TDOA_table);
-//                for(int j=0; j<SEARCH_POINT; j++){
-//                    printf("\n %d \n", j);
-//                    for(int i=0; i<MIC_PAIR; i++){
-//                        printf("%d\t", TDOA_table[i][j]);
-//                    }
-//                }
+                for(int j=0; j<SEARCH_POINT; j++){
+                    cPOINT point = index2xyz(j);
+                    printf("\nindex:%d, x:%d, y:%d, z:%d\t", j, point.x, point.y, point.z);
+                    for(int i=0; i<MIC_PAIR; i++){
+                        printf("%d\t", TDOA_table[i][j]);
+                    }
+                }
                 break;
             case i.get_tdoa_data(int32_t index) ->
                     {int8_t td0, int8_t td1, int8_t td2, int8_t td3, int8_t td4, int8_t td5}:
@@ -137,7 +142,7 @@ void tdoa_server(server interface tdoa_callback_if i)
                 td3 = TDOA_table[3][index];
                 td4 = TDOA_table[4][index];
                 td5 = TDOA_table[5][index];
-                printf("init_particle\n");
+//                printf("get_tdoa_data\n");
                 break;
         }
     }
@@ -167,13 +172,12 @@ void audio_server(
                         // enframe_data[j][i].real is float type, here should be int
                         c_frame :> tmp;
                         enframe_data[j][i].real = tmp;
-//                        printf("------%d\n", enframe_data[j][i]);
                     }
 //                    printf("receive one MIC ok!! %d\n", i);
-//                    xscope_int(CH_0, enframe_data[0][i]);
-//                    xscope_int(CH_1, enframe_data[1][i]);
-//                    xscope_int(CH_2, enframe_data[2][i]);
-//                    xscope_int(CH_3, enframe_data[3][i]);
+//                    xscope_int(CH_0, enframe_data[0][i].real);
+//                    xscope_int(CH_1, enframe_data[1][i].real);
+//                    xscope_int(CH_2, enframe_data[2][i].real);
+//                    xscope_int(CH_3, enframe_data[3][i].real);
                 }
 //                printf("receive one frame ok!!\n");
                 break;
@@ -183,17 +187,24 @@ void audio_server(
                 break;
             case i.srp_formulate():
                 caculate_gccphat(enframe_data, R);
+//                for(int8_t i=0; i<MIC_PAIR; i++){
+//                    for(int32_t j=0; j<FRAME_SIZE; j++){
+//                        printf("R[%d][%d]: %f\n", i, j, R[i][j].real);
+//                    }
+//                }
                 printf("srp_formulate\n");
                 break;
             case i.caculate_srp(int8_t td0, int8_t td1, int8_t td2,
                     int8_t td3, int8_t td4, int8_t td5) -> float srp_local:
                 int center = (FRAME_SIZE/2)-1;
+                srp_local = 0;
                 srp_local = srp_local + R[0][td0 + center].real;
                 srp_local = srp_local + R[1][td1 + center].real;
                 srp_local = srp_local + R[2][td2 + center].real;
                 srp_local = srp_local + R[3][td3 + center].real;
                 srp_local = srp_local + R[4][td4 + center].real;
                 srp_local = srp_local + R[5][td5 + center].real;
+//                printf("srp_local: %f\n", srp_local);
 //                int index = find_source_location(TDOA_table, R);
 //                printf("caculate_srp:%d\n", index);
                 break;
