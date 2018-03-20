@@ -125,8 +125,8 @@ cPOINT index2xyz(int16_t index)
 //    % cart = [(x-31)*100, (y-31)*100, (z-1)*300]
     cPOINT point;
     point.x = ((index % SEARCH_X_NUM) - (SEARCH_X_NUM/2)) * SEARCH_X_STEP;
-    point.y = (((index / SEARCH_X_NUM) % SEARCH_Y_NUM) + 1 - (SEARCH_X_NUM/2)) * SEARCH_Y_STEP;
-    point.z = ((((index / SEARCH_X_NUM) / SEARCH_Y_NUM)) + 1) * SEARCH_Z_STEP;
+    point.y = (((index / SEARCH_X_NUM) % SEARCH_Y_NUM) - (SEARCH_X_NUM/2)) * SEARCH_Y_STEP;
+    point.z = ((index / SEARCH_X_NUM) / SEARCH_Y_NUM) * SEARCH_Z_STEP;
 //    printf("index: %d, x: %d, y: %d, z:%d\n", index, point.x, point.y, point.z);
     return point;
 //    % cart = [(x-31)*100, (y-31)*100, (z-1)*300]
