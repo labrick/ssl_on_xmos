@@ -4,8 +4,8 @@ sound source localization on xmos
 验证进度
 -------
 
-[x] TDOA表格验证
-[]  FFT及IFFT验证
+1. TDOA表格验证
+2. FFT及IFFT验证
 
 Summary
 -------
