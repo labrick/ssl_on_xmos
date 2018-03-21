@@ -5,7 +5,12 @@ sound source localization on xmos
 -------
 
 1. TDOA表格验证
+    1. 从log中打印tdoa表格中的内容，保存为csv文件格式
+    2. matlab设置相同的参数产生tdoa表格
+    3. matlab对比两个表格是否相同
+    4. 结论：相同!
 2. FFT及IFFT验证
+    1. fft的结果imag部分总是和matlab结果正负相反，暂时加上个循环将imag部分取反，后面再细致解决
 
 Summary
 -------
