@@ -37,11 +37,12 @@ void create_tdoa_table(int8_t TDOA_table[MIC_PAIR][SEARCH_POINT])
                 d2 = calulate_distance(tmp_apoint, mic_loc[j]);
                 dd = d2 - d1;
                 tdoa = round((dd/C)*FS);
-//                printf("int tdoa is %d, i=%d, mic_pair=%d\n", tdoa, i, mic_pair_cnt);
+                printf("%d, ", tdoa);
                 TDOA_table[mic_pair_cnt][i] = tdoa;
                 mic_pair_cnt++;
             }
         }
+        printf("\n");
     }
 }
 #else
