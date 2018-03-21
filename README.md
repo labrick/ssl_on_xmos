@@ -1,12 +1,11 @@
-.. |I2S| replace:: I\ :sup:`2`\ S
-.. |I2C| replace:: I\ :sup:`2`\ C
-
-Using the I2S library
+sound source localization on xmos
 =====================
 
-.. appnote:: AN00162
+验证进度
+-------
 
-.. version:: 1.0.3
+[x] TDOA表格验证
+[]  FFT及IFFT验证
 
 Summary
 -------
