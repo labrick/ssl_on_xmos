@@ -52,11 +52,11 @@ void c_mul(complex a,complex b,complex *c)
 //
 void Wn_i(int n,int i,complex *Wn,char flag)
 {
-  Wn->real = cos(2*PI*i/n);
-  if(flag == 1)
-  Wn->imag = -sin(2*PI*i/n);
-  else if(flag == 0)
-  Wn->imag = -sin(2*PI*i/n);
+    Wn->real = cos(2*PI*i/n);
+    if(flag == 1)
+        Wn->imag = -sin(2*PI*i/n);
+    else if(flag == 0)
+        Wn->imag = -sin(2*PI*i/n);
 }
 
 // ∏µ¿Ô“∂±‰ªª
@@ -100,6 +100,9 @@ void fft(int N, complex f[])
                 c_plus(f[n], t, &(f[n]));   // f[n] = f[n] + f[lc] * Wnr
             }
         }
+    }
+    for(i=0; i<N; i++){
+        f[i].imag = -f[i].imag;
     }
 }
 
