@@ -11,6 +11,10 @@ sound source localization on xmos
     4. 结论：相同!
 2. FFT及IFFT验证
     1. fft的结果imag部分总是和matlab结果正负相反，暂时加上个循环将imag部分取反，后面再细致解决
+    2. FFT验证通过！
+    3. 归一化程序和互相关理论验证没问题！
+    4. IFFT验证通过
+    5. 增加fftshift，并验证通过！
 
 Summary
 -------
