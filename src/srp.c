@@ -15,6 +15,7 @@ void point_multi(complex data1[], complex data2[], complex result[], int N)
 {
     int i;
     for(i=0; i<N; i++){
+        // data1 * conj(data2)
         result[i].real =  data1[i].real * data2[i].real + data1[i].imag * data2[i].imag;
         result[i].imag = - data1[i].real * data2[i].imag + data1[i].imag * data2[i].real;
     }
@@ -36,11 +37,11 @@ void showfft(float *real ,float *imag){
 * 输入：需要归一化的虚部和实部数组
 * 输出: 归一化结果
 *******************************/
-void process_datafft(complex data[FRAME_SIZE])
+void process_datafft(int N, complex data[FRAME_SIZE])
 {
     int i;
     float phat;
-    for (i=0; i<FRAME_SIZE; i++){
+    for (i=0; i<N; i++){
         phat = sqrt(data[i].real*data[i].real + data[i].imag*data[i].imag);
         data[i].real = data[i].real/phat;
         data[i].imag = data[i].imag/phat;
@@ -56,13 +57,26 @@ void process_datafft(complex data[FRAME_SIZE])
 *******************************/
 void caculate_gccphat(complex enframe_data[MIC][FRAME_SIZE], complex result[MIC_PAIR][FRAME_SIZE]) // ,float result[MIC_PAIR][FRAME_SIZE])
 {
+//    float x = 0;
+//    for(int32_t i=0; i<1024; i++, x=x+0.1){
+//        enframe_data[0][i].real = sin(x);
+//        printf("%f, %f\n", enframe_data[0][i].real, enframe_data[0][i].imag);
+//    }
+//    printf("do fft once ...\n");
+//    fft(1024, enframe_data[0]);
+//    process_datafft(1024, enframe_data[0]);
+//    printf("do once over\n");
+//    for(int32_t i=0; i<1024; i++){
+//        printf("%f, %f\n", enframe_data[0][i].real, enframe_data[0][i].imag);
+//    }
+
     printf("do fft ...\n");
     for(int8_t i=0; i<MIC; i++){
 //        fftComputeOnce(myFFT, enframe_data[i], enframe_data_real[i], enframe_data_imag[i]);
         fft(FRAME_SIZE, enframe_data[i]);
     }
     for(int8_t i=0; i<MIC; i++){
-        process_datafft(enframe_data[i]);
+        process_datafft(FRAME_SIZE, enframe_data[i]);
     }
 
    // Calculate the cross-power spectrum = fft(x1).*conj(fft(x2))
@@ -73,10 +87,24 @@ void caculate_gccphat(complex enframe_data[MIC][FRAME_SIZE], complex result[MIC_
            p++;
         }
     }
+//    for(int32_t i=0; i<FRAME_SIZE; i++){
+//        printf("%f, %f\n", result[0][i].real, result[0][i].imag);
+//    }
+//    printf("ifft below ...\n");
     for(int8_t p=0; p<MIC_PAIR; p++){
-//        ifftComputeOnce(myFFT, result_real, result_imag ,result[p]);
         ifft(FRAME_SIZE, result[p]);
+        fftshift(result[p], FRAME_SIZE);
     }
+//    for(int32_t i=0; i<FRAME_SIZE; i++){
+//        printf("%f, %f\n", result[0][i].real, result[0][i].imag);
+//    }
+//    printf("fftshift below ...\n");
+//    for(int8_t p=0; p<MIC_PAIR; p++){
+//        fftshift(result[p], FRAME_SIZE);
+//    }
+//    for(int32_t i=0; i<FRAME_SIZE; i++){
+//        printf("%f, %f\n", result[0][i].real, result[0][i].imag);
+//    }
 }
 
 /**********************************
