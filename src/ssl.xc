@@ -36,11 +36,11 @@ void wav2frame(streaming chanend c_wav, server interface wav_frame_if i_frame, s
             to_frame = 0;
             for(size_t i=0; i<FRAME_SIZE; i++){
                 c_wav :> in_samps[1];       // 0 data of second mic
-                c_frame <: in_samps[1];
+                c_frame <: (int)(in_samps[1]*1);
                 c_wav :> in_samps[3];       // 1 data of third mic
                 c_frame <: in_samps[3];
                 c_wav :> in_samps[2];       // 2 data of second mic
-                c_frame <: in_samps[2];
+                c_frame <: (int)(in_samps[2]/1);
                 c_wav :> in_samps[0];       // 3 data of four mic
                 c_frame <: in_samps[0];
 //                printf("send one MIC ok!! %d\n", i);
@@ -49,8 +49,8 @@ void wav2frame(streaming chanend c_wav, server interface wav_frame_if i_frame, s
         }
 
         xscope_int(CH_0, in_samps[0]);
-        xscope_int(CH_1, in_samps[1]);
-        xscope_int(CH_2, in_samps[2]);
+        xscope_int(CH_1, (int)(in_samps[1]*1));
+        xscope_int(CH_2, (int)(in_samps[2]/1));
         xscope_int(CH_3, in_samps[3]);
 //        printf("%d\n", in_samps[0]);
         select{
@@ -85,11 +85,12 @@ void ssl_loopback(
         i_audio_server.get_wav_frame();
 //        i.extract_audio_frame();
         i_audio_server.srp_formulate();
+        cPOINT sound_point, tmp_point;
+        int16_t same_srp_count = 0;
         while(1){
 //            location_index = update_particle(
 //                    particle_location, particle_speed, best_fitness, best_location_in_all);
             float max_srp = 0;
-            int32_t max_srp_index = 0;
             for(int32_t i=0; i<SEARCH_POINT; i++){
                 int8_t td0, td1, td2, td3, td4, td5;
                 {td0, td1, td2, td3, td4, td5} = i_tdoa_server.get_tdoa_data(i);
@@ -98,13 +99,24 @@ void ssl_loopback(
 //                printf("%f, ", srp_phat);
                 if(srp_phat > max_srp){
                     max_srp = srp_phat;
-                    max_srp_index = i;
+                    tmp_point = index2xyz(i);
+                    sound_point = tmp_point;
+                    same_srp_count = 1;
+                } else if(srp_phat == max_srp){
+                    tmp_point = index2xyz(i);
+                    sound_point.x += tmp_point.x;
+                    sound_point.y += tmp_point.y;
+                    sound_point.z += tmp_point.z;
+                    same_srp_count++;
                 }
             }
-            printf("max_srp_index: %d, max_srp: %f\n", max_srp_index, max_srp);
-            cPOINT point = index2xyz(max_srp_index);
+            sound_point.x /= same_srp_count;
+            sound_point.y /= same_srp_count;
+            sound_point.z /= same_srp_count;
+            printf("sound_point, x:%d, y:%d, z:%d, max_srp: %f, same_srp_count:%d\n",
+                    sound_point.x, sound_point.y, sound_point.z, max_srp, same_srp_count);
 //            printf("index2xyz, x:%d, y:%d, z:%d\n", point.x, point.y, point.z);
-            pPOINT ppoint = cart_to_sph(point);
+            pPOINT ppoint = cart_to_sph(sound_point);
             printf("max_srp_index to sph: theta: %d, phi:%d, r:%d\n", ppoint.theta, ppoint.phi, ppoint.r);
 //            i_audio_server.ssl_is_ok();
 //            i_audio_server.get_results();
@@ -126,13 +138,6 @@ void tdoa_server(server interface tdoa_callback_if i)
             case i.create_tdoa_table():
                 printf("create_tdoa_table\n");
                 create_tdoa_table(TDOA_table);
-                for(int j=0; j<SEARCH_POINT; j++){
-                    cPOINT point = index2xyz(j);
-                    printf("\nindex:%d, x:%d, y:%d, z:%d\t", j, point.x, point.y, point.z);
-                    for(int i=0; i<MIC_PAIR; i++){
-                        printf("%d\t", TDOA_table[i][j]);
-                    }
-                }
                 break;
             case i.get_tdoa_data(int32_t index) ->
                     {int8_t td0, int8_t td1, int8_t td2, int8_t td3, int8_t td4, int8_t td5}:
