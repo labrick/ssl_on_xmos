@@ -127,3 +127,26 @@ void ifft(int N, complex f[])
         f[i].real = (f[i].real)/N;
     }
 }
+
+void fftshift(complex data[], int count)
+{
+    complex tmp;
+    int k = 0;
+    int c = (int) floor((float)count/2);
+    // For odd and for even numbers of element use different algorithm
+    if (count % 2 == 0){
+        for (k = 0; k < c; k++){
+            tmp = data[k];
+            data[k] = data[k+c];
+            data[k+c] = tmp;
+        }
+    }
+    else{
+        complex tmp = data[0];
+        for (k = 0; k < c; k++){
+            data[k] = data[c + k + 1];
+            data[c + k + 1] = data[k + 1];
+        }
+        data[c] = tmp;
+    }
+}

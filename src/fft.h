@@ -29,5 +29,5 @@ typedef struct complex //复数类型
 void fft(int N, complex f[]);                   // 傅立叶变换 输出也存在数组f中
 void ifft(int N, complex f[]);                  // 傅里叶逆变换
 //void c_abs(complex f[],double out[],int n);   // 复数数组取模
-
+void fftshift(complex data[], int count);
 #endif /* FFT_H_ */
