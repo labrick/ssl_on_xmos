@@ -20,6 +20,7 @@
 #include "particle.h"
 #include "fft.h"
 #include "srp.h"
+#include "time.h"
 
 void wav2frame(streaming chanend c_wav, server interface wav_frame_if i_frame, streaming chanend c_frame)
 {
@@ -67,6 +68,8 @@ void ssl_loopback(
         client interface audio_callback_if i_audio_server,
         client interface tdoa_callback_if i_tdoa_server)
 {
+    printf("starting ssl...\n");
+    int32_t ssl_count = 0;
     // location by index, so use int8_t
     int8_t particle_location[POPULATION_NUM][3];
     float particle_speed[POPULATION_NUM][3];
@@ -75,20 +78,31 @@ void ssl_loopback(
 //    int8_t best_location_in_all[3];
 
 //    int32_t location_index;
-
+    clock_t tstart_time, tend_time, start_time, end_time;
+    tstart_time = clock();
     i_tdoa_server.create_tdoa_table();
+    tend_time = clock();
+    printf("create_tdoa_table, take time:%f\n", (float)(tend_time-tstart_time)/CLOCKS_PER_SEC);
     while(1){
-        printf("init_particle\n");
+        printf("-------- ssl count: %d\n", ssl_count++);
+        start_time = clock();
+        tstart_time = clock();
         init_particle(particle_location, particle_speed);
+        tend_time = clock();
+        printf("init_particle, take time:%f\n", (float)(tend_time-tstart_time)/CLOCKS_PER_SEC);
         memcpy(best_location, particle_location, sizeof(int8_t)*POPULATION_NUM*3);
 
+        tstart_time = clock();
         i_audio_server.get_wav_frame();
 //        i.extract_audio_frame();
         i_audio_server.srp_formulate();
+        tend_time = clock();
+        printf("process audio, take time:%f\n", (float)(tend_time-tstart_time)/CLOCKS_PER_SEC);
         aPOINT sound_point;
         cPOINT tmp_point;
         pPOINT ppoint;
         int16_t same_srp_count = 0;
+        tstart_time = clock();
         while(1){
 //            location_index = update_particle(
 //                    particle_location, particle_speed, best_fitness, best_location_in_all);
@@ -109,8 +123,8 @@ void ssl_loopback(
                 } else if(srp_phat == max_srp){
                     tmp_point = index2xyz(i);
                     ppoint = cart_to_sph(tmp_point);
-                    printf("sound_point, x:%d\ty:%d\tz:%d\tsph, theta:%d\tphi:%d\tr:%d\tmax_srp: %f\n",
-                            tmp_point.x, tmp_point.y, tmp_point.z, ppoint.theta, ppoint.phi, ppoint.r, max_srp);
+//                    printf("sound_point, x:%d\ty:%d\tz:%d\tsph, theta:%d\tphi:%d\tr:%d\tmax_srp: %f\n",
+//                            tmp_point.x, tmp_point.y, tmp_point.z, ppoint.theta, ppoint.phi, ppoint.r, max_srp);
                     sound_point.x += tmp_point.x;
                     sound_point.y += tmp_point.y;
                     sound_point.z += tmp_point.z;
@@ -120,16 +134,21 @@ void ssl_loopback(
             tmp_point.x = sound_point.x / same_srp_count;
             tmp_point.y = sound_point.y / same_srp_count;
             tmp_point.z = sound_point.z / same_srp_count;
-            printf("sound_point, x:%d, y:%d, z:%d, max_srp: %f, same_srp_count:%d\n",
-                    tmp_point.x, tmp_point.y, tmp_point.z, max_srp, same_srp_count);
+//            printf("sound_point, x:%d, y:%d, z:%d, max_srp: %f, same_srp_count:%d\n",
+//                    tmp_point.x, tmp_point.y, tmp_point.z, max_srp, same_srp_count);
 //            printf("index2xyz, x:%d, y:%d, z:%d\n", point.x, point.y, point.z);
             ppoint = cart_to_sph(tmp_point);
-            printf("max_srp_index to sph: theta: %d, phi:%d, r:%d\n", ppoint.theta, ppoint.phi, ppoint.r);
+//            printf("sound location: theta: %d, phi:%d, r:%d\n", ppoint.theta, ppoint.phi, ppoint.r);
+            printf("sound location: theta: %d, r:%d\n", ppoint.theta, ppoint.r);
 //            i_audio_server.ssl_is_ok();
 //            i_audio_server.get_results();
 //            i_audio_server.update_particle();
             break;
         }
+        tend_time = clock();
+        printf("location estimation, take time:%f\n", (float)(tend_time-tstart_time)/CLOCKS_PER_SEC);
+        end_time = clock();
+        printf("this ssl take time:%f\n", (float)(end_time-start_time)/CLOCKS_PER_SEC);
 //        break;
     }
 }
@@ -143,7 +162,6 @@ void tdoa_server(server interface tdoa_callback_if i)
     while(1){
         select{
             case i.create_tdoa_table():
-                printf("create_tdoa_table\n");
                 create_tdoa_table(TDOA_table);
                 break;
             case i.get_tdoa_data(int32_t index) ->
@@ -177,7 +195,6 @@ void audio_server(
     while(1){
         select{
             case i.get_wav_frame():
-                printf("get_wav_frame\n");
                 i_frame.get_frame_data();
                 for(size_t i=0; i<FRAME_SIZE; i++){
                     for(size_t j=0; j<MIC; j++){
@@ -204,7 +221,6 @@ void audio_server(
 //                        printf("R[%d][%d]: %f\n", i, j, R[i][j].real);
 //                    }
 //                }
-                printf("srp_formulate\n");
                 break;
             case i.caculate_srp(int8_t td0, int8_t td1, int8_t td2,
                     int8_t td3, int8_t td4, int8_t td5) -> float srp_local:
