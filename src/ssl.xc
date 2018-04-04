@@ -85,7 +85,9 @@ void ssl_loopback(
         i_audio_server.get_wav_frame();
 //        i.extract_audio_frame();
         i_audio_server.srp_formulate();
-        cPOINT sound_point, tmp_point;
+        aPOINT sound_point;
+        cPOINT tmp_point;
+        pPOINT ppoint;
         int16_t same_srp_count = 0;
         while(1){
 //            location_index = update_particle(
@@ -100,23 +102,28 @@ void ssl_loopback(
                 if(srp_phat > max_srp){
                     max_srp = srp_phat;
                     tmp_point = index2xyz(i);
-                    sound_point = tmp_point;
+                    sound_point.x = tmp_point.x;
+                    sound_point.y = tmp_point.y;
+                    sound_point.z = tmp_point.z;
                     same_srp_count = 1;
                 } else if(srp_phat == max_srp){
                     tmp_point = index2xyz(i);
+                    ppoint = cart_to_sph(tmp_point);
+                    printf("sound_point, x:%d\ty:%d\tz:%d\tsph, theta:%d\tphi:%d\tr:%d\tmax_srp: %f\n",
+                            tmp_point.x, tmp_point.y, tmp_point.z, ppoint.theta, ppoint.phi, ppoint.r, max_srp);
                     sound_point.x += tmp_point.x;
                     sound_point.y += tmp_point.y;
                     sound_point.z += tmp_point.z;
                     same_srp_count++;
                 }
             }
-            sound_point.x /= same_srp_count;
-            sound_point.y /= same_srp_count;
-            sound_point.z /= same_srp_count;
+            tmp_point.x = sound_point.x / same_srp_count;
+            tmp_point.y = sound_point.y / same_srp_count;
+            tmp_point.z = sound_point.z / same_srp_count;
             printf("sound_point, x:%d, y:%d, z:%d, max_srp: %f, same_srp_count:%d\n",
-                    sound_point.x, sound_point.y, sound_point.z, max_srp, same_srp_count);
+                    tmp_point.x, tmp_point.y, tmp_point.z, max_srp, same_srp_count);
 //            printf("index2xyz, x:%d, y:%d, z:%d\n", point.x, point.y, point.z);
-            pPOINT ppoint = cart_to_sph(sound_point);
+            ppoint = cart_to_sph(tmp_point);
             printf("max_srp_index to sph: theta: %d, phi:%d, r:%d\n", ppoint.theta, ppoint.phi, ppoint.r);
 //            i_audio_server.ssl_is_ok();
 //            i_audio_server.get_results();
