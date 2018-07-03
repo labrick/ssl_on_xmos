@@ -70,7 +70,7 @@ void caculate_gccphat(complex enframe_data[MIC][FRAME_SIZE], complex result[MIC_
 //        printf("%f, %f\n", enframe_data[0][i].real, enframe_data[0][i].imag);
 //    }
 
-    printf("do fft ...\n");
+//    printf("do fft ...\n");
     for(int8_t i=0; i<MIC; i++){
 //        fftComputeOnce(myFFT, enframe_data[i], enframe_data_real[i], enframe_data_imag[i]);
         fft(FRAME_SIZE, enframe_data[i]);
